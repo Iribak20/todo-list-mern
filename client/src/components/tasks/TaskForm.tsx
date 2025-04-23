@@ -73,7 +73,31 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
     try {
       const formattedDate = new Date(data.dueDate);
       
-      if (task) {
+      if (!task) {
+        // Create new task
+        const newTask = {
+          title: data.title,
+          description: data.description || "",
+          assignee: data.assignee || "Zayad Kabiri",
+          status: data.status || "todo",
+          priority: data.priority || "medium", 
+          dueDate: formattedDate,
+          completed: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        const result = await createTask.mutateAsync(newTask);
+        if (result) {
+          toast({
+            title: "Success",
+            description: "Task created successfully"
+          });
+          form.reset();
+          window.location.href = '/tasks';
+        }
+      } else {
+        // Update existing task
         const updatedTask = {
           title: data.title,
           description: data.description || "",
