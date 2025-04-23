@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { WebSocketServer } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { 
   insertTaskSchema, 
@@ -50,6 +50,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertTaskSchema.parse(req.body);
       const task = await storage.createTask(validatedData);
+      
+      // Notify connected clients about the new task
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'task-created',
+            payload: task,
+            timestamp: new Date().toISOString()
+          }));
+        }
+      });
+      
       res.status(201).json(task);
     } catch (error) {
       console.error("Error creating task:", error);
@@ -70,6 +82,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedTask = await storage.updateTask(req.params.id, req.body);
+      
+      // Notify connected clients about the task update
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'task-updated',
+            payload: updatedTask,
+            timestamp: new Date().toISOString()
+          }));
+        }
+      });
+      
       res.json(updatedTask);
     } catch (error) {
       console.error("Error updating task:", error);
@@ -184,6 +208,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertTeamSchema.parse(req.body);
       const team = await storage.createTeam(validatedData);
+      
+      // Notify connected clients about the new team
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'team-created',
+            payload: team,
+            timestamp: new Date().toISOString()
+          }));
+        }
+      });
+      
       res.status(201).json(team);
     } catch (error) {
       console.error("Error creating team:", error);
@@ -346,6 +382,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertDiscussionSchema.parse(req.body);
       const discussion = await storage.createDiscussion(validatedData);
+      
+      // Notify connected clients about the new discussion
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'discussion-created',
+            payload: discussion,
+            timestamp: new Date().toISOString()
+          }));
+        }
+      });
+      
       res.status(201).json(discussion);
     } catch (error) {
       console.error("Error creating discussion:", error);

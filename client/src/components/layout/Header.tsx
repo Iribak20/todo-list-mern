@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, Moon, Bell, Settings } from "lucide-react";
+import { Menu, Moon, Settings } from "lucide-react";
 import { useTheme } from "next-themes";
+import { RealTimeNotifications } from "@/components/ui/real-time-notifications";
 
 type HeaderProps = {
   setMobileOpen: (open: boolean) => void;
@@ -32,12 +33,9 @@ const Header = ({ setMobileOpen }: HeaderProps) => {
           >
             <Moon className="h-5 w-5" />
           </button>
-          <button className="p-2 rounded-full hover:bg-neutral-200 transition-colors relative">
-            <Bell className="h-5 w-5" />
-            {hasNotifications && (
-              <span className="absolute top-1 right-1 bg-destructive w-2 h-2 rounded-full"></span>
-            )}
-          </button>
+          <div className="p-2 rounded-full hover:bg-neutral-200 transition-colors relative">
+            <RealTimeNotifications />
+          </div>
           <button className="p-2 rounded-full hover:bg-neutral-200 transition-colors">
             <Settings className="h-5 w-5" />
           </button>
