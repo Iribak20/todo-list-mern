@@ -1,44 +1,47 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
-interface AvatarWithStatusProps {
+type AvatarWithStatusProps = {
   user: string;
-}
+  status?: "online" | "offline" | "away" | "busy";
+  className?: string;
+};
 
-const AvatarWithStatus = ({ user }: AvatarWithStatusProps) => {
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase();
-  };
+export default function AvatarWithStatus({
+  user,
+  status = "online",
+  className,
+}: AvatarWithStatusProps) {
+  const initials = user
+    .split(" ")
+    .map((name) => name[0])
+    .join("")
+    .toUpperCase()
+    .substring(0, 2);
 
-  // Generate a deterministic color based on the name
-  const getColor = (name: string) => {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    
-    const hue = Math.abs(hash % 360);
-    return `hsl(${hue}, 70%, 60%)`;
+  const statusColorMap = {
+    online: "bg-green-500",
+    offline: "bg-gray-500",
+    away: "bg-yellow-500",
+    busy: "bg-red-500",
   };
 
   return (
-    <div className="flex items-center">
-      <Avatar className="h-8 w-8 rounded-full mr-2">
-        <AvatarFallback 
-          style={{ 
-            backgroundColor: getColor(user),
-            color: 'white'
-          }}
-        >
-          {getInitials(user)}
-        </AvatarFallback>
-      </Avatar>
-      <span>{user}</span>
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        <Avatar className={cn("h-8 w-8", className)}>
+          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+        <span
+          className={cn(
+            "absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white",
+            statusColorMap[status]
+          )}
+        />
+      </div>
+      <span className="text-sm font-medium">{user}</span>
     </div>
   );
-};
-
-export default AvatarWithStatus;
+}

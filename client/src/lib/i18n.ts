@@ -123,7 +123,9 @@ const translations = {
     error: "Erreur",
     teamMembersSoon: "Fonctionnalité de gestion des membres à venir bientôt...",
     successTeamCreate: "Équipe créée avec succès!",
-    successDiscussionCreate: "Discussion créée avec succès!"
+    successDiscussionCreate: "Discussion créée avec succès!",
+    created: "Créé le",
+    user: "Utilisateur"
   }
 };
 
