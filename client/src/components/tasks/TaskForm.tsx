@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -72,31 +71,8 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
   const onSubmit = async (data: FormValues) => {
     try {
       const formattedDate = new Date(data.dueDate);
-      
-      if (!task) {
-        // Create new task
-        const newTask = {
-          title: data.title,
-          description: data.description || "",
-          assignee: data.assignee || "Zayad Kabiri",
-          status: data.status || "todo",
-          priority: data.priority || "medium", 
-          dueDate: formattedDate,
-          completed: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
 
-        const result = await createTask.mutateAsync(newTask);
-        if (result) {
-          toast({
-            title: "Success",
-            description: "Task created successfully"
-          });
-          form.reset();
-          window.location.href = '/tasks';
-        }
-      } else {
+      if (task) {
         // Update existing task
         const updatedTask = {
           title: data.title,
@@ -119,6 +95,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           description: "Task updated successfully",
         });
       } else {
+        // Create new task
         const newTask = {
           title: data.title,
           description: data.description || "",
@@ -131,32 +108,23 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           updatedAt: new Date()
         };
 
-        try {
-          const result = await createTask.mutateAsync(newTask);
-          if (result) {
-            toast({
-              title: "Success", 
-              description: "Task created successfully",
-            });
-            form.reset();
-            window.location.href = '/tasks';
-          }
-        } catch (error) {
-          console.error("Error creating task:", error);
+        const result = await createTask.mutateAsync(newTask);
+        if (result) {
           toast({
-            title: "Error",
-            description: "Failed to create task. Please try again.",
-            variant: "destructive",
+            title: "Success",
+            description: "Task created successfully",
           });
+          form.reset();
+          window.location.href = '/tasks';
         }
       }
 
       if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("Erreur lors de la soumission du formulaire:", error);
+      console.error("Error submitting form:", error);
       toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la sauvegarde. Veuillez réessayer.",
+        title: "Error",
+        description: "An error occurred while saving. Please try again.",
         variant: "destructive",
       });
     }
