@@ -2,8 +2,25 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Task, TaskStatus, InsertTask } from "@shared/schema";
 
+interface TaskStatistics {
+  total: number;
+  todoCount: number;
+  inProgressCount: number;
+  completedCount: number;
+  completionRate: number;
+  overdueTasks: number;
+  tasksByPriority: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  tasksByAssignee: Record<string, number>;
+  recentlyCompletedTasks: Task[];
+  upcomingDeadlines: Task[];
+}
+
 export const useTaskStats = () => {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<TaskStatistics>({
     queryKey: ["/api/stats/tasks"],
     refetchOnWindowFocus: false
   });

@@ -1,15 +1,49 @@
 import { useQuery } from "@tanstack/react-query";
-import { PerformanceStatistics } from "@shared/schema";
+
+interface PerformanceUser {
+  username: string;
+  score: number;
+  tasksCompleted: number;
+}
+
+interface PerformanceUserStats {
+  tasksCompleted: number;
+  tasksCreated: number;
+  score: number;
+}
+
+interface PerformanceStatsData {
+  topPerformers: PerformanceUser[];
+  averageCompletionTime: number;
+  totalTasksCompleted: number;
+  totalTasksCreated: number;
+  onTimeCompletionRate: number;
+  performanceByUser: Record<string, PerformanceUserStats>;
+}
+
+interface PerformanceRecord {
+  _id: string;
+  userId: number;
+  username: string;
+  tasksCompleted: number;
+  tasksCreated: number;
+  onTimeCompletion: number;
+  lateCompletion: number;
+  weeklyScore: number;
+  monthlyScore: number;
+  period: string;
+  createdAt: string;
+}
 
 // Performance statistics
 export const usePerformanceStats = () => {
-  const { data: stats, isLoading, error } = useQuery({
+  const { data: stats, isLoading, error } = useQuery<PerformanceStatsData>({
     queryKey: ['/api/stats/performance'],
     refetchOnWindowFocus: false
   });
 
   return {
-    stats: stats as PerformanceStatistics,
+    stats,
     isLoading,
     error,
     getTopPerformers: () => stats?.topPerformers || [],
@@ -26,7 +60,7 @@ export const usePerformanceStats = () => {
 
 // User performance
 export const useUserPerformance = (username: string) => {
-  const { data: performance, isLoading, error } = useQuery({
+  const { data: performance, isLoading, error } = useQuery<PerformanceRecord[]>({
     queryKey: ['/api/performance', username],
     enabled: !!username
   });

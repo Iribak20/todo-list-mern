@@ -26,7 +26,7 @@ const translations = {
     taskDistribution: "Répartition des tâches",
     taskDistributionDesc: "Vue d'ensemble de l'état de vos tâches",
     upcomingTasks: "Tâches à venir",
-    nextTasksToProcess: "Les 2 prochaines tâches à traiter",
+    nextTasksToProcess: "Les 3 prochaines tâches à traiter",
     viewAllTasks: "Voir toutes les tâches",
     
     // Task table
@@ -58,7 +58,72 @@ const translations = {
     description: "Description",
     dueDate: "Date d'échéance",
     save: "Enregistrer",
-    cancel: "Annuler"
+    cancel: "Annuler",
+    
+    // Teams
+    myTeams: "Mes équipes",
+    createTeam: "Créer une équipe",
+    teamName: "Nom de l'équipe",
+    teamDescription: "Description de l'équipe",
+    teamLeader: "Chef d'équipe",
+    members: "Membres",
+    addMember: "Ajouter un membre",
+    removeMember: "Retirer",
+    role: "Rôle",
+    leader: "Chef",
+    member: "Membre",
+    observer: "Observateur",
+    teamPerformance: "Performance de l'équipe",
+    tasksCompletedByTeam: "Tâches complétées par l'équipe",
+    createNewTeam: "Créer une nouvelle équipe",
+    
+    // Discussions
+    allDiscussions: "Toutes les discussions",
+    createDiscussion: "Nouvelle discussion",
+    discussionTitle: "Titre de la discussion",
+    discussionContent: "Contenu",
+    author: "Auteur",
+    category: "Catégorie",
+    general: "Général",
+    technical: "Technique",
+    help: "Aide",
+    announcement: "Annonce",
+    comments: "Commentaires",
+    leaveComment: "Laisser un commentaire",
+    postComment: "Publier",
+    views: "Vues",
+    likes: "J'aime",
+    lastUpdated: "Dernière mise à jour",
+    
+    // Performance
+    performanceMetrics: "Métriques de performance",
+    topPerformers: "Meilleurs performeurs",
+    completionRate: "Taux d'achèvement",
+    onTimeCompletion: "Achèvement à temps",
+    tasksCreated: "Tâches créées",
+    userPerformance: "Performance de l'utilisateur",
+    weeklyScore: "Score hebdomadaire",
+    monthlyScore: "Score mensuel",
+    overdueTasks: "Tâches en retard",
+    
+    // General
+    loading: "Chargement...",
+    noData: "Aucune donnée disponible",
+    edit: "Modifier",
+    delete: "Supprimer",
+    view: "Voir",
+    filter: "Filtrer",
+    apply: "Appliquer",
+    clear: "Effacer",
+    search: "Rechercher",
+    noResults: "Aucun résultat trouvé",
+    confirm: "Confirmer",
+    confirmDelete: "Êtes-vous sûr de vouloir supprimer cet élément?",
+    success: "Succès",
+    error: "Erreur",
+    teamMembersSoon: "Fonctionnalité de gestion des membres à venir bientôt...",
+    successTeamCreate: "Équipe créée avec succès!",
+    successDiscussionCreate: "Discussion créée avec succès!"
   }
 };
 
