@@ -85,7 +85,8 @@ export function DiscussionForm({ open, onOpenChange, teamId, onSuccess }: Discus
 
       console.log("Submitting discussion:", discussion);
   
-      await createDiscussion.mutateAsync(discussion, {
+      // Utiliser la fonction mutate au lieu de mutateAsync
+      await createDiscussion.mutate(discussion, {
         onSuccess: () => {
           toast({
             title: t("success"),

@@ -76,6 +76,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
         console.log("Mise à jour de tâche:", task._id);
         const updatedTask = {
           ...data,
+          dueDate: new Date(data.dueDate), // Convertir la chaîne de date en objet Date
           completed: data.status === "done",
           updatedAt: new Date()
         };
@@ -95,6 +96,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
         console.log("Création d'une nouvelle tâche");
         const newTask = {
           ...data,
+          dueDate: new Date(data.dueDate), // Convertir la chaîne de date en objet Date
           completed: data.status === "done",
           createdAt: new Date(),
           updatedAt: new Date()

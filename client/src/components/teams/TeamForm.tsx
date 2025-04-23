@@ -71,7 +71,8 @@ export function TeamForm({ open, onOpenChange, onSuccess }: TeamFormProps) {
   
       console.log("Submitting team:", team);
       
-      await createTeam.mutateAsync(team, {
+      // Utiliser la fonction mutate au lieu de mutateAsync
+      await createTeam.mutate(team, {
         onSuccess: () => {
           toast({
             title: t("success"),

@@ -83,7 +83,7 @@ const Calendar = () => {
             <Badge 
               key={i} 
               variant="outline" 
-              className={`text-xs ${getTaskStatusClass(task.status)}`}
+              className={`text-xs ${getTaskStatusClass(task.status || 'todo')}`}
             >
               {task.title.substring(0, 10)}
               {task.title.length > 10 && '...'}
@@ -213,7 +213,7 @@ const Calendar = () => {
                   {tasksOnDate.map((task: Task) => (
                     <div
                       key={task._id}
-                      className={`p-3 rounded-md border ${getTaskStatusClass(task.status)}`}
+                      className={`p-3 rounded-md border ${getTaskStatusClass(task.status || 'todo')}`}
                     >
                       <div className="font-medium">{task.title}</div>
                       <div className="text-sm text-muted-foreground">{task.description || "Aucune description"}</div>

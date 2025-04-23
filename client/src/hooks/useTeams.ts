@@ -32,7 +32,7 @@ export const useTeam = (id: string) => {
 export const useCreateTeam = () => {
   const queryClient = useQueryClient();
   
-  return useMutation({
+  return useMutation<any, Error, InsertTeam>({
     mutationFn: (team: InsertTeam) => apiRequest("POST", "/api/teams", team),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/teams'] });
