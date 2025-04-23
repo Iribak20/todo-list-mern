@@ -72,31 +72,66 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
     try {
       console.log("Soumission des données du formulaire:", data);
       
+      // Formater la date correctement
+      let formattedDate;
+      try {
+        formattedDate = new Date(data.dueDate);
+        console.log("Date formatée:", formattedDate);
+      } catch (err) {
+        console.error("Erreur de formatage de date:", err);
+        formattedDate = new Date();
+      }
+      
       if (task) {
         console.log("Mise à jour de tâche:", task._id);
-        const updatedTask = {
-          ...data,
-          dueDate: new Date(data.dueDate), // Convertir la chaîne de date en objet Date
-          completed: data.status === "done",
-          updatedAt: new Date()
+        
+        // Créer l'objet de mise à jour
+        let updatedTask = {
+          title: data.title,
+          description: data.description || "",
+          assignee: data.assignee,
+          status: data.status || "todo",
+          priority: data.priority || "medium",
+          dueDate: formattedDate,
+          completed: data.status === "done"
         };
         
         console.log("Données de mise à jour:", updatedTask);
         
-        await updateTask.mutateAsync({
-          id: task._id,
-          task: updatedTask,
-        });
-        
-        toast({
-          title: "Tâche mise à jour",
-          description: "La tâche a été mise à jour avec succès.",
-        });
+        try {
+          // Utiliser directement fetch au lieu de la mutation pour plus de contrôle
+          const response = await fetch(`/api/tasks/${task._id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedTask)
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          console.log("Résultat de la mise à jour:", result);
+          
+          toast({
+            title: "Tâche mise à jour",
+            description: "La tâche a été mise à jour avec succès.",
+          });
+        } catch (fetchError) {
+          console.error("Erreur lors de la mise à jour:", fetchError);
+          throw fetchError;
+        }
       } else {
         console.log("Création d'une nouvelle tâche");
-        const newTask = {
-          ...data,
-          dueDate: new Date(data.dueDate), // Convertir la chaîne de date en objet Date
+        
+        // Créer un nouvel objet tâche bien formaté
+        let newTask = {
+          title: data.title,
+          description: data.description || "",
+          assignee: data.assignee,
+          status: data.status || "todo",
+          priority: data.priority || "medium",
+          dueDate: formattedDate,
           completed: data.status === "done",
           createdAt: new Date(),
           updatedAt: new Date()
@@ -104,13 +139,29 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
         
         console.log("Données de nouvelle tâche:", newTask);
         
-        const result = await createTask.mutateAsync(newTask);
-        console.log("Résultat de la création:", result);
-        
-        toast({
-          title: "Tâche créée",
-          description: "La tâche a été créée avec succès.",
-        });
+        try {
+          // Utiliser directement fetch au lieu de la mutation pour plus de contrôle
+          const response = await fetch('/api/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTask)
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          console.log("Résultat de la création:", result);
+          
+          toast({
+            title: "Tâche créée",
+            description: "La tâche a été créée avec succès.",
+          });
+        } catch (fetchError) {
+          console.error("Erreur lors de la création:", fetchError);
+          throw fetchError;
+        }
       }
       
       if (onSuccess) onSuccess();
