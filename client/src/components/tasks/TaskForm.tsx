@@ -71,7 +71,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
   const onSubmit = async (data: FormValues) => {
     try {
       const formattedDate = new Date(data.dueDate);
-      
+
       if (task) {
         const updatedTask = {
           title: data.title,
@@ -83,7 +83,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           completed: data.status === "done",
           updatedAt: new Date()
         };
-        
+
         await updateTask.mutateAsync({
           id: task._id,
           task: updatedTask
@@ -106,18 +106,22 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           updatedAt: new Date()
         };
 
-        await createTask.mutateAsync(newTask);
+        const result = await createTask.mutateAsync(newTask);
 
-        toast({
-          title: "Success", 
-          description: "Task created successfully",
-        });
+        if (result) {
+          toast({
+            title: "Success", 
+            description: "Task created successfully",
+          });
+
+          // Clear form and redirect
+          form.reset();
+          window.location.href = '/tasks';
+        }
       }
-      
+
       form.reset();
       if (onSuccess) onSuccess();
-      window.location.href = '/tasks';
-      form.reset();
     } catch (error) {
       console.error("Erreur lors de la soumission du formulaire:", error);
       toast({
