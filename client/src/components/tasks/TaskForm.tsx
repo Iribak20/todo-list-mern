@@ -70,21 +70,9 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      console.log("Soumission des données du formulaire:", data);
-      
-      // Formater la date correctement
-      let formattedDate;
-      try {
-        formattedDate = new Date(data.dueDate);
-        console.log("Date formatée:", formattedDate);
-      } catch (err) {
-        console.error("Erreur de formatage de date:", err);
-        formattedDate = new Date();
-      }
+      const formattedDate = new Date(data.dueDate);
       
       if (task) {
-        console.log("Updating task:", task._id);
-        
         const updatedTask = {
           title: data.title,
           description: data.description || "",
@@ -92,26 +80,20 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           status: data.status || "todo",
           priority: data.priority || "medium",
           dueDate: formattedDate,
-          completed: data.status === "done"
+          completed: data.status === "done",
+          updatedAt: new Date()
         };
         
-        try {
-          await updateTask.mutateAsync({
-            id: task._id,
-            task: updatedTask
-          });
-          
-          toast({
-            title: "Task updated",
-            description: "The task has been updated successfully.",
-          });
-        } catch (error) {
-          console.error("Error updating task:", error);
-          throw error;
-        }
+        await updateTask.mutateAsync({
+          id: task._id,
+          task: updatedTask
+        });
+
+        toast({
+          title: "Success",
+          description: "Task updated successfully",
+        });
       } else {
-        console.log("Creating new task");
-        
         const newTask = {
           title: data.title,
           description: data.description || "",
@@ -123,18 +105,13 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           createdAt: new Date(),
           updatedAt: new Date()
         };
-        
-        try {
-          await createTask.mutateAsync(newTask);
-          
-          toast({
-            title: "Task created",
-            description: "The task has been created successfully.",
-          });
-        } catch (error) {
-          console.error("Error creating task:", error);
-          throw error;
-        }
+
+        await createTask.mutateAsync(newTask);
+
+        toast({
+          title: "Success", 
+          description: "Task created successfully",
+        });
       }
       
       if (onSuccess) onSuccess();
