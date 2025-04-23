@@ -98,23 +98,32 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
         const newTask = {
           title: data.title,
           description: data.description || "",
-          assignee: data.assignee,
+          assignee: data.assignee || "Zayad Kabiri",
           status: data.status || "todo",
           priority: data.priority || "medium",
           dueDate: formattedDate,
-          completed: data.status === "done",
+          completed: false,
           createdAt: new Date(),
           updatedAt: new Date()
         };
 
-        const result = await createTask.mutateAsync(newTask);
-        if (result) {
+        try {
+          const result = await createTask.mutateAsync(newTask);
+          if (result) {
+            toast({
+              title: "Success", 
+              description: "Task created successfully",
+            });
+            form.reset();
+            window.location.href = '/tasks';
+          }
+        } catch (error) {
+          console.error("Error creating task:", error);
           toast({
-            title: "Success", 
-            description: "Task created successfully",
+            title: "Error",
+            description: "Failed to create task. Please try again.",
+            variant: "destructive",
           });
-          form.reset();
-          window.location.href = '/tasks';
         }
       }
 
