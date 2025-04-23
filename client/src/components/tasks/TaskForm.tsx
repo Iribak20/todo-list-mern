@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -71,7 +72,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
   const onSubmit = async (data: FormValues) => {
     try {
       const formattedDate = new Date(data.dueDate);
-
+      
       if (task) {
         const updatedTask = {
           title: data.title,
@@ -107,20 +108,16 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
         };
 
         const result = await createTask.mutateAsync(newTask);
-
         if (result) {
           toast({
             title: "Success", 
             description: "Task created successfully",
           });
-
-          // Clear form and redirect
           form.reset();
           window.location.href = '/tasks';
         }
       }
 
-      form.reset();
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Erreur lors de la soumission du formulaire:", error);
