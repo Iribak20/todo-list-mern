@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useTasks, useDeleteTask } from "@/hooks/useTasks";
 import { t } from "@/lib/i18n";
 import TaskForm from "./TaskForm";
-import { Task } from "@shared/schema";
 
 const TaskList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,10 +16,10 @@ const TaskList = () => {
   const deleteTask = useDeleteTask();
   const { toast } = useToast();
 
-  const filteredTasks = tasks.filter((task) =>
+  const filteredTasks = tasks?.filter((task) =>
     task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     task.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) || [];
 
   const handleDeleteTask = async (id: string) => {
     try {
