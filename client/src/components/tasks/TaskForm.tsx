@@ -1,125 +1,81 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { insertTaskSchema } from "@shared/schema";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
-import { t } from "@/lib/i18n";
 import { Task } from "@shared/schema";
 
-const formSchema = insertTaskSchema.extend({
-  dueDate: z.string().min(1, "La date d'échéance est requise"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-type TaskFormProps = {
+interface TaskFormProps {
   task?: Task;
   onSuccess?: () => void;
-};
+}
 
-const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
+const FormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  assignee: z.string().min(1, "Assignee is required"),
+  status: z.string().min(1, "Status is required"),
+  priority: z.string().min(1, "Priority is required"),
+  dueDate: z.string().min(1, "Due date is required"),
+});
+
+type FormValues = z.infer<typeof FormSchema>;
+
+export default function TaskForm({ task, onSuccess }: TaskFormProps) {
   const { toast } = useToast();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0];
-  };
-
-  const defaultValues: Partial<FormValues> = task
-    ? {
-        title: task.title,
-        description: task.description || "",
-        assignee: task.assignee,
-        priority: task.priority,
-        status: task.status,
-        dueDate: formatDate(new Date(task.dueDate)),
-      }
-    : {
-        title: "",
-        description: "",
-        assignee: "",
-        priority: "medium",
-        status: "todo",
-        dueDate: formatDate(new Date()),
-      };
-
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      title: task?.title || "",
+      description: task?.description || "",
+      assignee: task?.assignee || "",
+      status: task?.status || "todo",
+      priority: task?.priority || "medium",
+      dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "",
+    },
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const formattedDate = new Date(data.dueDate);
+      const formattedData = {
+        ...data,
+        dueDate: new Date(data.dueDate),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
       if (task) {
-        // Update existing task
-        const updatedTask = {
-          title: data.title,
-          description: data.description || "",
-          assignee: data.assignee,
-          status: data.status || "todo",
-          priority: data.priority || "medium",
-          dueDate: formattedDate,
-          completed: data.status === "done",
-          updatedAt: new Date()
-        };
-
-        await updateTask.mutateAsync({
+        const result = await updateTask.mutateAsync({
           id: task._id,
-          task: updatedTask
+          data: formattedData,
         });
 
-        toast({
-          title: "Success",
-          description: "Task updated successfully",
-        });
+        if (result) {
+          toast({
+            title: "Success",
+            description: "Task updated successfully",
+          });
+          if (onSuccess) onSuccess();
+        }
       } else {
-        // Create new task
-        const newTask = {
-          title: data.title,
-          description: data.description || "",
-          assignee: data.assignee || "Zayad Kabiri",
-          status: data.status || "todo",
-          priority: data.priority || "medium",
-          dueDate: formattedDate,
-          completed: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
+        const result = await createTask.mutateAsync(formattedData);
 
-        const result = await createTask.mutateAsync(newTask);
         if (result) {
           toast({
             title: "Success",
             description: "Task created successfully",
           });
           form.reset();
-          window.location.href = '/tasks';
+          if (onSuccess) onSuccess();
         }
       }
-
-      if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({
@@ -131,140 +87,79 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("taskTitle")}</FormLabel>
-              <FormControl>
-                <Input placeholder="Titre de la tâche" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <Input
+          placeholder="Task title"
+          {...form.register("title")}
         />
+        {form.formState.errors.title && (
+          <p className="text-red-500 text-sm mt-1">{form.formState.errors.title.message}</p>
+        )}
+      </div>
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("description")}</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Description de la tâche" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div>
+        <Textarea
+          placeholder="Description"
+          {...form.register("description")}
         />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="dueDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("dueDate")}</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <div>
+        <Input
+          placeholder="Assignee"
+          {...form.register("assignee")}
+        />
+        {form.formState.errors.assignee && (
+          <p className="text-red-500 text-sm mt-1">{form.formState.errors.assignee.message}</p>
+        )}
+      </div>
 
-          <FormField
-            control={form.control}
-            name="priority"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("priority")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner une priorité" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="low">{t("low")}</SelectItem>
-                    <SelectItem value="medium">{t("medium")}</SelectItem>
-                    <SelectItem value="high">{t("high")}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+      <div>
+        <Select
+          onValueChange={(value) => form.setValue("status", value)}
+          defaultValue={form.getValues("status")}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todo">To Do</SelectItem>
+            <SelectItem value="inprogress">In Progress</SelectItem>
+            <SelectItem value="done">Done</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="assignee"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("assignedTo")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Assigner à" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Zayad Kabiri">Zayad Kabiri</SelectItem>
-                    <SelectItem value="Walid Chitam">Walid Chitam</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <div>
+        <Select
+          onValueChange={(value) => form.setValue("priority", value)}
+          defaultValue={form.getValues("priority")}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select priority" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="high">High</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("status")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un statut" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="todo">{t("todo")}</SelectItem>
-                    <SelectItem value="inprogress">{t("inprogress")}</SelectItem>
-                    <SelectItem value="done">{t("done")}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+      <div>
+        <Input
+          type="date"
+          {...form.register("dueDate")}
+        />
+        {form.formState.errors.dueDate && (
+          <p className="text-red-500 text-sm mt-1">{form.formState.errors.dueDate.message}</p>
+        )}
+      </div>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => onSuccess && onSuccess()}
-          >
-            {t("cancel")}
-          </Button>
-          <Button 
-            type="submit" 
-            disabled={createTask.isPending || updateTask.isPending}
-          >
-            {task ? "Mettre à jour" : t("save")}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      <Button type="submit" className="w-full">
+        {task ? "Update Task" : "Create Task"}
+      </Button>
+    </form>
   );
-};
-
-export default TaskForm;
+}

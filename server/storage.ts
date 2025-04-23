@@ -102,10 +102,32 @@ export class MongoStorage implements IStorage {
       this.client = new MongoClient(this.uri);
       await this.client.connect();
       this.db = this.client.db(this.dbName);
-      console.log('Connected to MongoDB Atlas');
+      
+      // Initialize collections
+      await this.initializeCollections();
+      console.log('Connected to MongoDB Atlas and initialized collections');
     } catch (error) {
       console.error('Error connecting to MongoDB:', error);
       throw error;
+    }
+  }
+
+  private async initializeCollections(): Promise<void> {
+    if (!this.db) throw new Error('Database not connected');
+
+    const collections = [
+      'tasks',
+      'teams',
+      'discussions',
+      'comments',
+      'performance'
+    ];
+
+    for (const collectionName of collections) {
+      if (!(await this.db.listCollections({ name: collectionName }).hasNext())) {
+        await this.db.createCollection(collectionName);
+        console.log(`Collection ${collectionName} created successfully`);
+      }
     }
   }
 
