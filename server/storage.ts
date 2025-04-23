@@ -153,6 +153,12 @@ export class MongoStorage implements IStorage {
     if (!this.db) throw new Error('Database not connected');
     
     try {
+      // Ensure tasks collection exists
+      if (!await this.db.listCollections({name: 'tasks'}).hasNext()) {
+        await this.db.createCollection('tasks');
+        console.log('Tasks collection created successfully');
+      }
+
       const result = await this.db.collection('tasks').insertOne({
         ...task,
         createdAt: new Date(),
