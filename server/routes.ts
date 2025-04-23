@@ -48,8 +48,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new task
   app.post("/api/tasks", async (req: Request, res: Response) => {
     try {
-      const validatedData = insertTaskSchema.parse(req.body);
+      console.log("Création de tâche - Corps de la requête:", JSON.stringify(req.body));
+      
+      // Prétraitement de la requête pour assurer que les dates sont correctement formatées
+      const processedData = req.body;
+      
+      // S'assurer que dueDate est un objet Date
+      if (processedData.dueDate && typeof processedData.dueDate === 'string') {
+        try {
+          processedData.dueDate = new Date(processedData.dueDate);
+          console.log("Date d'échéance convertie:", processedData.dueDate);
+        } catch (dateError) {
+          console.error("Erreur lors de la conversion de la date d'échéance:", dateError);
+          processedData.dueDate = new Date(); // Valeur par défaut en cas d'erreur
+        }
+      }
+      
+      // S'assurer que createdAt et updatedAt sont des objets Date
+      if (!processedData.createdAt) processedData.createdAt = new Date();
+      if (!processedData.updatedAt) processedData.updatedAt = new Date();
+      
+      console.log("Données prétraitées:", JSON.stringify(processedData, (key, value) => {
+        // Convertir les dates en chaînes ISO pour l'affichage dans les logs
+        if (value instanceof Date) return value.toISOString();
+        return value;
+      }));
+      
+      // Essayer de valider avec le schéma
+      const validatedData = insertTaskSchema.parse(processedData);
+      console.log("Données validées avec succès");
+      
+      // Créer la tâche dans la base de données
       const task = await storage.createTask(validatedData);
+      console.log("Tâche créée:", JSON.stringify(task));
       
       // Notify connected clients about the new task
       wss.clients.forEach((client) => {
@@ -64,12 +95,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(task);
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.error("Erreur détaillée lors de la création de la tâche:", error);
       if (error instanceof ZodError) {
+        console.log("Erreur de validation Zod:", fromZodError(error).message);
         const validationError = fromZodError(error);
-        return res.status(400).json({ message: validationError.message });
+        return res.status(400).json({ message: validationError.message, details: error.errors });
       }
-      res.status(500).json({ message: "Failed to create task" });
+      res.status(500).json({ message: "Échec de la création de la tâche", error: String(error) });
     }
   });
 
