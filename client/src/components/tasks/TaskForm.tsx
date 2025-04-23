@@ -114,7 +114,9 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
         });
       }
       
+      form.reset();
       if (onSuccess) onSuccess();
+      window.location.href = '/tasks';
       form.reset();
     } catch (error) {
       console.error("Erreur lors de la soumission du formulaire:", error);
