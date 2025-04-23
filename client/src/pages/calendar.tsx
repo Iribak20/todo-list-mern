@@ -85,8 +85,8 @@ const Calendar = () => {
               variant="outline" 
               className={`text-xs ${getTaskStatusClass(task.status || 'todo')}`}
             >
-              {task.title.substring(0, 10)}
-              {task.title.length > 10 && '...'}
+              {task.title ? task.title.substring(0, 10) : "Sans titre"}
+              {task.title && task.title.length > 10 && '...'}
             </Badge>
           ))
         )}
@@ -203,7 +203,17 @@ const Calendar = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => setShowTaskForm(false)}
+                    onClick={() => {
+                      // Rafraîchir la page et ouvrir à nouveau le formulaire mais sans tâches existantes
+                      setSelectedDate(null);
+                      setTimeout(() => {
+                        setShowTaskForm(false);
+                        setTimeout(() => {
+                          setSelectedDate(selectedDate);
+                          setShowTaskForm(true);
+                        }, 100);
+                      }, 100);
+                    }}
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     Ajouter une tâche
@@ -215,11 +225,11 @@ const Calendar = () => {
                       key={task._id}
                       className={`p-3 rounded-md border ${getTaskStatusClass(task.status || 'todo')}`}
                     >
-                      <div className="font-medium">{task.title}</div>
+                      <div className="font-medium">{task.title || "Sans titre"}</div>
                       <div className="text-sm text-muted-foreground">{task.description || "Aucune description"}</div>
                       <div className="flex justify-between mt-2 text-xs">
-                        <span>Assigné à: {task.assignee}</span>
-                        <Badge>{task.status}</Badge>
+                        <span>Assigné à: {task.assignee || "Non assigné"}</span>
+                        <Badge>{task.status || "todo"}</Badge>
                       </div>
                     </div>
                   ))}
@@ -227,7 +237,23 @@ const Calendar = () => {
               </div>
             ) : (
               <TaskForm 
-                onSuccess={() => setShowTaskForm(false)}
+                task={selectedDate ? {
+                  _id: "",
+                  title: "",
+                  description: "",
+                  status: "todo",
+                  priority: "medium",
+                  assignee: "Zayad Kabiri",
+                  dueDate: selectedDate,
+                  completed: false,
+                  createdAt: new Date(),
+                  updatedAt: new Date()
+                } : undefined}
+                onSuccess={() => {
+                  setShowTaskForm(false);
+                  // Ajouter un petit délai avant de rafraîchir la page pour s'assurer que les données sont bien enregistrées
+                  setTimeout(() => window.location.reload(), 500);
+                }}
               />
             )}
           </div>

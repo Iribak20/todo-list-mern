@@ -210,8 +210,7 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="Zayad Kabiri">Zayad Kabiri</SelectItem>
-                    <SelectItem value="Laura Martin">Laura Martin</SelectItem>
-                    <SelectItem value="Thomas Dubois">Thomas Dubois</SelectItem>
+                    <SelectItem value="Walid Chitam">Walid Chitam</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
