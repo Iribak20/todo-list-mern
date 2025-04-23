@@ -83,10 +83,9 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
       }
       
       if (task) {
-        console.log("Mise à jour de tâche:", task._id);
+        console.log("Updating task:", task._id);
         
-        // Créer l'objet de mise à jour
-        let updatedTask = {
+        const updatedTask = {
           title: data.title,
           description: data.description || "",
           assignee: data.assignee,
@@ -96,36 +95,24 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           completed: data.status === "done"
         };
         
-        console.log("Données de mise à jour:", updatedTask);
-        
         try {
-          // Utiliser directement fetch au lieu de la mutation pour plus de contrôle
-          const response = await fetch(`/api/tasks/${task._id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedTask)
+          await updateTask.mutateAsync({
+            id: task._id,
+            task: updatedTask
           });
-          
-          if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
-          }
-          
-          const result = await response.json();
-          console.log("Résultat de la mise à jour:", result);
           
           toast({
-            title: "Tâche mise à jour",
-            description: "La tâche a été mise à jour avec succès.",
+            title: "Task updated",
+            description: "The task has been updated successfully.",
           });
-        } catch (fetchError) {
-          console.error("Erreur lors de la mise à jour:", fetchError);
-          throw fetchError;
+        } catch (error) {
+          console.error("Error updating task:", error);
+          throw error;
         }
       } else {
-        console.log("Création d'une nouvelle tâche");
+        console.log("Creating new task");
         
-        // Créer un nouvel objet tâche bien formaté
-        let newTask = {
+        const newTask = {
           title: data.title,
           description: data.description || "",
           assignee: data.assignee,
@@ -137,30 +124,16 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
           updatedAt: new Date()
         };
         
-        console.log("Données de nouvelle tâche:", newTask);
-        
         try {
-          // Utiliser directement fetch au lieu de la mutation pour plus de contrôle
-          const response = await fetch('/api/tasks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newTask)
-          });
-          
-          if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
-          }
-          
-          const result = await response.json();
-          console.log("Résultat de la création:", result);
+          await createTask.mutateAsync(newTask);
           
           toast({
-            title: "Tâche créée",
-            description: "La tâche a été créée avec succès.",
+            title: "Task created",
+            description: "The task has been created successfully.",
           });
-        } catch (fetchError) {
-          console.error("Erreur lors de la création:", fetchError);
-          throw fetchError;
+        } catch (error) {
+          console.error("Error creating task:", error);
+          throw error;
         }
       }
       
