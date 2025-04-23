@@ -90,24 +90,24 @@ export default function TaskForm({ task, onSuccess }: TaskFormProps) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Input
-          placeholder="Task title"
+          placeholder="Titre de la tâche"
           {...form.register("title")}
         />
         {form.formState.errors.title && (
-          <p className="text-red-500 text-sm mt-1">{form.formState.errors.title.message}</p>
+          <p className="text-red-500 text-sm mt-1">Le titre est requis</p>
         )}
       </div>
 
       <div>
         <Textarea
-          placeholder="Description"
+          placeholder="Description de la tâche"
           {...form.register("description")}
         />
       </div>
 
       <div>
         <Input
-          placeholder="Assignee"
+          placeholder="Assigné à"
           {...form.register("assignee")}
         />
         {form.formState.errors.assignee && (
@@ -121,12 +121,12 @@ export default function TaskForm({ task, onSuccess }: TaskFormProps) {
           defaultValue={form.getValues("status")}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select status" />
+            <SelectValue placeholder="Sélectionner le statut" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todo">To Do</SelectItem>
-            <SelectItem value="inprogress">In Progress</SelectItem>
-            <SelectItem value="done">Done</SelectItem>
+            <SelectItem value="todo">À faire</SelectItem>
+            <SelectItem value="inprogress">En cours</SelectItem>
+            <SelectItem value="done">Terminé</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -137,12 +137,12 @@ export default function TaskForm({ task, onSuccess }: TaskFormProps) {
           defaultValue={form.getValues("priority")}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select priority" />
+            <SelectValue placeholder="Sélectionner la priorité" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="low">Low</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="high">High</SelectItem>
+            <SelectItem value="low">Basse</SelectItem>
+            <SelectItem value="medium">Moyenne</SelectItem>
+            <SelectItem value="high">Haute</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -158,7 +158,7 @@ export default function TaskForm({ task, onSuccess }: TaskFormProps) {
       </div>
 
       <Button type="submit" className="w-full">
-        {task ? "Update Task" : "Create Task"}
+        {task ? "Modifier la tâche" : "Créer la tâche"}
       </Button>
     </form>
   );

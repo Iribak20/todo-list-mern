@@ -22,7 +22,9 @@ interface TaskStatistics {
 export const useTaskStats = () => {
   const { data: stats, isLoading } = useQuery<TaskStatistics>({
     queryKey: ["/api/stats/tasks"],
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: true,
+    refetchInterval: 5000, // Refresh every 5 seconds
+    staleTime: 1000 // Consider data stale after 1 second
   });
 
   return {
