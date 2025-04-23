@@ -36,7 +36,7 @@ export const useDiscussion = (id: string) => {
 export const useCreateDiscussion = () => {
   const queryClient = useQueryClient();
   
-  return useMutation({
+  return useMutation<any, Error, InsertDiscussion>({
     mutationFn: (discussion: InsertDiscussion) => 
       apiRequest("POST", "/api/discussions", discussion),
     onSuccess: () => {

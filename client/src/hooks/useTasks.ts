@@ -76,7 +76,7 @@ export const useTask = (id: string) => {
 };
 
 export const useCreateTask = () => {
-  return useMutation({
+  return useMutation<any, Error, InsertTask>({
     mutationFn: (task: InsertTask) => apiRequest("POST", "/api/tasks", task),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
@@ -86,7 +86,7 @@ export const useCreateTask = () => {
 };
 
 export const useUpdateTask = () => {
-  return useMutation({
+  return useMutation<any, Error, { id: string, task: Partial<Task> }>({
     mutationFn: ({ id, task }: { id: string, task: Partial<Task> }) => 
       apiRequest("PATCH", `/api/tasks/${id}`, task),
     onSuccess: (_, variables) => {

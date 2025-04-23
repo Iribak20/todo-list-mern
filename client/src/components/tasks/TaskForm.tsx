@@ -70,37 +70,54 @@ const TaskForm = ({ task, onSuccess }: TaskFormProps) => {
 
   const onSubmit = async (data: FormValues) => {
     try {
+      console.log("Soumission des données du formulaire:", data);
+      
       if (task) {
+        console.log("Mise à jour de tâche:", task._id);
+        const updatedTask = {
+          ...data,
+          completed: data.status === "done",
+          updatedAt: new Date()
+        };
+        
+        console.log("Données de mise à jour:", updatedTask);
+        
         await updateTask.mutateAsync({
           id: task._id,
-          task: {
-            ...data,
-            completed: data.status === "done",
-            updatedAt: new Date()
-          },
+          task: updatedTask,
         });
+        
         toast({
           title: "Tâche mise à jour",
           description: "La tâche a été mise à jour avec succès.",
         });
       } else {
-        await createTask.mutateAsync({
+        console.log("Création d'une nouvelle tâche");
+        const newTask = {
           ...data,
           completed: data.status === "done",
           createdAt: new Date(),
           updatedAt: new Date()
-        });
+        };
+        
+        console.log("Données de nouvelle tâche:", newTask);
+        
+        const result = await createTask.mutateAsync(newTask);
+        console.log("Résultat de la création:", result);
+        
         toast({
           title: "Tâche créée",
           description: "La tâche a été créée avec succès.",
         });
       }
+      
       if (onSuccess) onSuccess();
       form.reset();
     } catch (error) {
+      console.error("Erreur lors de la soumission du formulaire:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur s'est produite. Veuillez réessayer.",
+        description: "Une erreur s'est produite lors de la sauvegarde. Veuillez réessayer.",
         variant: "destructive",
       });
     }
