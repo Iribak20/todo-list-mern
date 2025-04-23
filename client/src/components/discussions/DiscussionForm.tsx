@@ -69,37 +69,49 @@ export function DiscussionForm({ open, onOpenChange, teamId, onSuccess }: Discus
     },
   });
 
-  function onSubmit(data: DiscussionFormValues) {
-    const discussion: InsertDiscussion = {
-      title: data.title,
-      content: data.content,
-      author: data.author,
-      category: data.category as DiscussionCategory,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      teamId: teamId,
-      likes: 0,
-      views: 0
-    };
+  async function onSubmit(data: DiscussionFormValues) {
+    try {
+      const discussion: InsertDiscussion = {
+        title: data.title,
+        content: data.content,
+        author: data.author,
+        category: data.category as DiscussionCategory,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        teamId: teamId,
+        likes: 0,
+        views: 0
+      };
 
-    createDiscussion(discussion, {
-      onSuccess: () => {
-        toast({
-          title: t("success"),
-          description: t("successDiscussionCreate"),
-        });
-        form.reset();
-        onOpenChange(false);
-        if (onSuccess) onSuccess();
-      },
-      onError: (error) => {
-        toast({
-          title: t("error"),
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+      console.log("Submitting discussion:", discussion);
+  
+      await createDiscussion.mutateAsync(discussion, {
+        onSuccess: () => {
+          toast({
+            title: t("success"),
+            description: t("successDiscussionCreate"),
+          });
+          form.reset();
+          onOpenChange(false);
+          if (onSuccess) onSuccess();
+        },
+        onError: (error) => {
+          console.error("Error creating discussion:", error);
+          toast({
+            title: t("error"),
+            description: error.message || "Une erreur s'est produite lors de la création de la discussion",
+            variant: "destructive",
+          });
+        },
+      });
+    } catch (error) {
+      console.error("Exception creating discussion:", error);
+      toast({
+        title: t("error"),
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive",
+      });
+    }
   }
 
   return (

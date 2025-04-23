@@ -58,34 +58,46 @@ export function TeamForm({ open, onOpenChange, onSuccess }: TeamFormProps) {
     },
   });
 
-  function onSubmit(data: TeamFormValues) {
-    const team: InsertTeam = {
-      name: data.name,
-      description: data.description || "",
-      leader: data.leader,
-      createdAt: new Date(),
-      completedTasks: 0,
-      totalTasks: 0
-    };
-
-    createTeam(team, {
-      onSuccess: () => {
-        toast({
-          title: t("success"),
-          description: t("successTeamCreate"),
-        });
-        form.reset();
-        onOpenChange(false);
-        if (onSuccess) onSuccess();
-      },
-      onError: (error) => {
-        toast({
-          title: t("error"),
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+  async function onSubmit(data: TeamFormValues) {
+    try {
+      const team: InsertTeam = {
+        name: data.name,
+        description: data.description || "",
+        leader: data.leader,
+        createdAt: new Date(),
+        completedTasks: 0,
+        totalTasks: 0
+      };
+  
+      console.log("Submitting team:", team);
+      
+      await createTeam.mutateAsync(team, {
+        onSuccess: () => {
+          toast({
+            title: t("success"),
+            description: t("successTeamCreate"),
+          });
+          form.reset();
+          onOpenChange(false);
+          if (onSuccess) onSuccess();
+        },
+        onError: (error) => {
+          console.error("Error creating team:", error);
+          toast({
+            title: t("error"),
+            description: error.message || "Une erreur s'est produite lors de la création de l'équipe",
+            variant: "destructive",
+          });
+        },
+      });
+    } catch (error) {
+      console.error("Exception creating team:", error);
+      toast({
+        title: t("error"),
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
