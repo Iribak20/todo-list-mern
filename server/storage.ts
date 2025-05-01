@@ -1,4 +1,5 @@
 import { MongoClient, Db, ObjectId } from 'mongodb';
+import dotenv from 'dotenv';
 import { 
   InsertTask, Task, TaskStatus, 
   InsertTeam, Team, 
@@ -8,6 +9,9 @@ import {
   InsertPerformance, Performance,
   InsertUser, User
 } from '@shared/schema';
+
+// Load environment variables
+dotenv.config();
 
 export interface IStorage {
   // Connection
@@ -95,7 +99,7 @@ export class MongoStorage implements IStorage {
   private client: MongoClient | null = null;
   private db: Db | null = null;
   private readonly dbName = 'todo_app';
-  private readonly uri = process.env.MONGODB_URI || 'mongodb+srv://iribak:KQQwQ4QqZ4Fs1O9n@cluster0.6ripjfr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  private readonly uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 
   async connect(): Promise<void> {
     try {
